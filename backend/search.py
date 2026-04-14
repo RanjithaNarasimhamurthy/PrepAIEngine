@@ -156,6 +156,10 @@ def hybrid_search(
     if not combined:
         combined = structured_search(limit=limit, offset=offset)
 
+    # Filter out records with no company identified (noise)
+    if query or company:
+        combined = [r for r in combined if r.get("company") and r["company"].strip()]
+
     return {
         "results":     combined[:limit],
         "total":       len(combined),
