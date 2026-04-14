@@ -13,11 +13,13 @@ venv/
 dist/
 build/
 
-# Data — large files, rebuilt by pipeline
+# Data — raw scrapes are large, keep out of git
 data/raw/
-data/processed/
-data/faiss_index.bin
-data/faiss_metadata.json
+
+# Processed data and FAISS index are committed so Render can serve them
+# data/processed/
+# data/faiss_index.bin
+# data/faiss_metadata.json
 
 # Node
 frontend/node_modules/
