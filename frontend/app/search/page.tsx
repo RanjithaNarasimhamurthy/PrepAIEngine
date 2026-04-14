@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { AlertCircle, Inbox } from "lucide-react";
 import SearchBar, { type SearchFilters } from "@/components/SearchBar";
@@ -10,7 +10,7 @@ import type { Interview } from "@/types";
 
 const PAGE_SIZE = 20;
 
-export default function SearchPage() {
+function SearchPageInner() {
   const searchParams = useSearchParams();
   const router       = useRouter();
 
@@ -159,5 +159,13 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="py-16 text-center text-gray-400">Loading…</div>}>
+      <SearchPageInner />
+    </Suspense>
   );
 }
