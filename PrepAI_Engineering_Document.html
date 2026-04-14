@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PrepAIEngine — AI System Design Document</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Georgia', serif;
+    font-size: 11pt;
+    line-height: 1.75;
+    color: #1a1a1a;
+    background: #fff;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 50px;
+  }
+
+  /* Cover */
+  .cover {
+    text-align: center;
+    padding: 60px 0 50px;
+    border-bottom: 2px solid #2563eb;
+    margin-bottom: 48px;
+  }
+  .cover h1 {
+    font-size: 26pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+  .cover .subtitle {
+    font-size: 13pt;
+    color: #4b5563;
+    font-style: italic;
+    margin-bottom: 24px;
+  }
+  .cover .author {
+    font-size: 11pt;
+    color: #374151;
+    font-weight: 600;
+  }
+  .cover .tag-row {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tag {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 9pt;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* Sections */
+  h2 {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 40px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dbeafe;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #1d4ed8;
+    margin: 22px 0 6px;
+  }
+  p {
+    margin-bottom: 14px;
+    text-align: justify;
+  }
+
+  /* Callout box */
+  .callout {
+    background: #f0f9ff;
+    border-left: 4px solid #2563eb;
+    padding: 14px 18px;
+    margin: 18px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 10.5pt;
+    color: #1e3a8a;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0 24px;
+    font-size: 10pt;
+  }
+  th {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f9fafb; }
+
+  /* Tradeoff list */
+  .tradeoff {
+    background: #fefce8;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+  }
+  .tradeoff strong { color: #92400e; }
+
+  /* Hindsight list */
+  .hindsight {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+  }
+  .hindsight strong { color: #166534; }
+
+  /* Architecture */
+  .arch {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Courier New', monospace;
+    font-size: 9pt;
+    line-height: 1.6;
+    padding: 20px 24px;
+    border-radius: 8px;
+    margin: 18px 0;
+    white-space: pre;
+  }
+
+  /* Decision label */
+  .decision-label {
+    display: inline-block;
+    font-size: 8.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  .built { background: #dcfce7; color: #166534; }
+  .used  { background: #dbeafe; color: #1e40af; }
+
+  /* Summary */
+  .summary-box {
+    background: #1e3a8a;
+    color: #e0e7ff;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-top: 40px;
+    line-height: 1.8;
+    font-size: 10.5pt;
+  }
+  .summary-box strong { color: #fff; }
+
+  /* Page break hints */
+  @media print {
+    body { padding: 40px 44px; }
+    h2 { page-break-after: avoid; }
+    .arch, table, .callout { page-break-inside: avoid; }
+    .cover { page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>PrepAIEngine</h1>
+  <p class="subtitle">AI-Powered Interview Intelligence Platform</p>
+  <p class="author">Ranjitha Narasimhamurthy</p>
+  <div class="tag-row">
+    <span class="tag">LLM Extraction</span>
+    <span class="tag">RAG</span>
+    <span class="tag">FAISS</span>
+    <span class="tag">FastAPI</span>
+    <span class="tag">Next.js</span>
+    <span class="tag">PostgreSQL</span>
+    <span class="tag">Redis</span>
+    <span class="tag">Ollama / LLaMA 3</span>
+  </div>
+</div>
+
+
+<!-- SECTION 1 -->
+<h2>1. What the System Was Designed to Do — and Why It Mattered</h2>
+
+<p>Every year, hundreds of thousands of software engineers prepare for technical interviews by reading Reddit posts — raw, unstructured, often noisy accounts of real interview experiences at Google, Amazon, Meta, and hundreds of other companies. The signal is genuinely valuable: people describe exactly which problems were asked, how many rounds they faced, whether they received an offer, and what they wish they had studied. But the format makes it nearly useless at scale. You cannot search across 10,000 posts. You cannot ask "what does Amazon consistently test for L4 roles?" You cannot generate a personalised study plan from raw anecdotes.</p>
+
+<p>PrepAIEngine was designed to close this gap entirely. The goal was to transform unstructured Reddit interview data into a queryable, analytically useful, and personally actionable intelligence platform — one that could answer three questions with genuine grounding in real data:</p>
+
+<div class="callout">
+  <strong>1. What is actually being asked?</strong> → Structured extraction of companies, roles, rounds, topics, and questions.<br/>
+  <strong>2. What patterns matter most?</strong> → Analytics dashboard with topic frequency, company volume, and offer rates.<br/>
+  <strong>3. How should I prepare?</strong> → Personalised week-by-week roadmaps and a RAG-powered AI assistant.
+</div>
+
+<p>This mattered because existing tools either scraped data without structuring it, or provided generic advice disconnected from actual interview patterns. The gap between "raw Reddit post" and "actionable prep insight" was entirely a data engineering and AI problem — and one worth solving properly.</p>
+
+<div class="arch">Reddit (PRAW)
+     │
+     ▼
+scraper/reddit_scraper.py ──► data/raw/posts.json + PostgreSQL (raw_posts)
+     │
+     ▼
+ml/llm_extractor.py  [Ollama / LLaMA 3]
+     │  + regex company fallback
+     │  + noise post filter
+     ▼
+PostgreSQL (interviews) ──► data/processed/structured.json
+     │
+     ▼
+ml/embeddings.py  [sentence-transformers → FAISS IndexFlatIP]
+     │
+     ▼
+backend/main.py  [FastAPI]
+   ├── /search     ← Hybrid: FAISS semantic + PostgreSQL filters + Redis cache
+   ├── /analytics  ← PostgreSQL aggregations + Redis cache
+   ├── /ask        ← RAG: FAISS retrieval → context prompt → Ollama
+   └── /roadmap    ← Topic scoring engine + LLM narrative
+     │
+     ▼
+frontend/  [Next.js 14 · TypeScript · Tailwind · Recharts]</div>
+
+
+<!-- SECTION 2 -->
+<h2>2. My Role and Responsibilities</h2>
+
+<p>I was solely responsible for the entire system — from architecture decisions to implementation to debugging production failures. This covered:</p>
+
+<table>
+  <tr><th>Area</th><th>Responsibility</th></tr>
+  <tr><td>Data pipeline</td><td>Scraper, LLM extractor, embedding builder, pipeline CLI orchestrator</td></tr>
+  <tr><td>AI / ML</td><td>Prompt engineering, JSON post-processing, regex fallback, noise filter, FAISS index, RAG system, roadmap scoring engine</td></tr>
+  <tr><td>Backend</td><td>FastAPI app, PostgreSQL schema, hybrid search, analytics aggregations, Redis session management</td></tr>
+  <tr><td>Frontend</td><td>Next.js 14 app — 5 pages, 4 components, API client, TypeScript types, Tailwind styling, Recharts dashboard</td></tr>
+  <tr><td>Infrastructure</td><td>PostgreSQL + Redis setup, environment configuration, dependency resolution</td></tr>
+  <tr><td>Iteration</td><td>Identified and fixed data quality issues (unknown companies, noise posts) post-deployment</td></tr>
+</table>
+
+<p>There was no team. Every decision — architectural, technical, and product — was made and justified independently.</p>
+
+
+<!-- SECTION 3 -->
+<h2>3. Where I Used Existing Tools — and Why</h2>
+
+<h3><span class="decision-label used">Used</span> PRAW — Python Reddit API Wrapper</h3>
+<p>Reddit's API involves OAuth complexity, rate limiting, and pagination quirks. PRAW abstracts all of this cleanly. The scraper's real value is in the keyword filtering, deduplication logic, and comment aggregation — not the HTTP layer. Writing a raw Reddit client would have added two days of work for zero differentiated value.</p>
+
+<h3><span class="decision-label used">Used</span> Ollama — Local LLM Runtime</h3>
+<p>Running LLaMA 3 (8B) locally via Ollama gave a fully offline, zero-cost LLM with no API rate limits during development. For a pipeline processing thousands of posts, hitting an external API would have introduced latency, cost, and rate limit failures. Ollama's interface is a single POST call — trivial to integrate, trivial to swap out for Groq or another provider later.</p>
+
+<h3><span class="decision-label used">Used</span> sentence-transformers (all-MiniLM-L6-v2)</h3>
+<p>This model produces 384-dimensional embeddings that are fast, compact, and accurate enough for semantic search over interview text. It runs on Apple MPS (Metal) out of the box. The alternative — fine-tuning a custom embedding model — would have required labelled interview data that didn't exist. Using a pre-trained general-purpose model with domain-specific retrieval context (FAISS + RAG) was the right tradeoff at this stage.</p>
+
+<h3><span class="decision-label used">Used</span> FAISS — Vector Search</h3>
+<p>FAISS is the standard for in-process vector search at small-to-medium scale. I didn't need a managed vector database (Pinecone, Weaviate, Qdrant) because the index fits entirely in memory, persistence is handled by serialising to disk, and there's no multi-tenant access pattern. <code>IndexFlatIP</code> with L2-normalised vectors gives exact cosine similarity with zero approximation error at this scale.</p>
+
+<h3><span class="decision-label used">Used</span> PostgreSQL with JSONB</h3>
+<p>Interview data has a semi-structured schema — most records have company and role, but rounds, OA details, and prep insights vary significantly. JSONB columns for flexible fields gave adaptability without sacrificing queryability. GIN-indexed <code>TEXT[]</code> arrays for topics and questions enabled fast <code>= ANY()</code> filter queries. A fully schemaless store would have lost the relational guarantees needed for accurate analytics aggregations.</p>
+
+<h3><span class="decision-label used">Used</span> Redis</h3>
+<p>LLM responses are expensive to generate (10–30 seconds each) and deterministic for the same question — caching them for an hour is an obvious win. Search results cached for 5 minutes handle repeated queries without hitting PostgreSQL or FAISS. TTL-based expiry is built into Redis natively. Writing a custom cache layer would have been redundant work.</p>
+
+
+<!-- SECTION 4 -->
+<h2>4. Where I Built From Scratch — and Why</h2>
+
+<h3><span class="decision-label built">Built</span> LLM Extraction Prompt and Post-Processing Pipeline</h3>
+<p>This was the core intellectual problem of the system. Getting LLaMA 3 to reliably return structured JSON from noisy Reddit text required careful prompt engineering: a system instruction explicitly forbidding hallucination, a strict JSON schema with typed fields and constrained enumerations, canonical topic names to prevent free-form variation, and instructions to map questions to known LeetCode problem names rather than vague descriptions.</p>
+<p>Post-processing was equally important. The sanitisation layer extracts the first valid JSON object from surrounding prose, normalises <code>offer_status</code> to a closed enum, validates <code>round_type</code> against a known set, and normalises company and role names through a canonical map of 150+ entries. This could not be off-the-shelf — extraction quality determines the quality of everything downstream.</p>
+
+<h3><span class="decision-label built">Built</span> Regex Company Name Fallback</h3>
+<p>LLaMA 3 frequently missed company names even when clearly present in the post text, returning <code>null</code> rather than hallucinating. I built a secondary extraction pass: after LLM extraction, if company is empty, scan the raw text with word-boundary regex against the canonical company map (sorted by name length descending to prevent partial matches). This recovered company attribution for a significant fraction of posts that would otherwise have been marked unknown.</p>
+
+<h3><span class="decision-label built">Built</span> Noise Post Filter</h3>
+<p>Many Reddit posts matching interview keywords were not interview experiences — general prep questions, rant posts, meme posts. Including them polluted the database with records containing no company, role, topics, questions, or rounds. I built <code>is_useful_record()</code> which discards any extracted record with zero signal across all five key fields. This ran at extraction time and was also exposed as a <code>--clean</code> pipeline command to retroactively remove noise. Filtering at extraction time rather than at query time kept the database clean and analytics accurate.</p>
+
+<h3><span class="decision-label built">Built</span> Hybrid Search Layer</h3>
+<p>The search endpoint combines FAISS semantic search (for free-text queries) and PostgreSQL structured filters (for company/role/topic facets). Neither alone was sufficient — semantic search misses exact company/topic matches; structured filters miss semantic intent. The hybrid layer deduplicates results by PostgreSQL ID, prepends semantic matches, and fills the remainder with structured results. No off-the-shelf tool handles this specific combination with deduplication and ordering.</p>
+
+<h3><span class="decision-label built">Built</span> Data-Driven Roadmap Scoring Engine</h3>
+<p>Rather than asking the LLM to generate a study plan from scratch (which produces generic, hallucinated output), I built a scoring engine first. It counts topic frequency across interviews matching the target company and role, applies base importance weights, and applies experience-level multipliers (beginners get foundational topics boosted; advanced candidates get System Design boosted). Topics are assigned to weeks in weighted order. The LLM is used only for a final 2–3 sentence narrative paragraph — where generation adds value because it is additive rather than structural. This approach grounds the roadmap in real data rather than model priors.</p>
+
+
+<!-- SECTION 5 -->
+<h2>5. Tradeoffs Made</h2>
+
+<div class="tradeoff">
+  <strong>Exact FAISS search over approximate</strong><br/>
+  Used <code>IndexFlatIP</code> (exact) rather than <code>IndexIVFFlat</code> (approximate). At 69–5000 vectors, exact search runs in milliseconds with no accuracy loss. At 100K+ vectors, approximate indexing becomes necessary. Correct choice for current scale with a clear migration path.
+</div>
+
+<div class="tradeoff">
+  <strong>Local LLM over API</strong><br/>
+  LLaMA 3 8B locally is slower (~10–15s per post) and less capable than GPT-4 or Claude. The tradeoff was cost, privacy, and rate limits — running locally costs nothing, has no rate limits, and doesn't send user data to third parties. For production with quality SLAs, swapping to Groq (LLaMA 3 via API at 500+ tokens/sec, free tier) would be the first change.
+</div>
+
+<div class="tradeoff">
+  <strong>Single FAISS index over per-company indices</strong><br/>
+  All interviews share one index. This simplifies the architecture but means semantic search is global — a query for "Google system design" might surface Amazon results if the text is similar. The structured filter layer compensates, but a more sophisticated system might maintain per-company indices or use FAISS metadata filtering.
+</div>
+
+<div class="tradeoff">
+  <strong>Batch extraction over streaming</strong><br/>
+  The pipeline processes posts in discrete batches rather than continuously. This introduces a lag between scraping and availability. A production system would use a message queue (Kafka, RabbitMQ) to stream posts through the pipeline in real time. Batch processing was chosen for simplicity — one Python script versus a distributed system.
+</div>
+
+<div class="tradeoff">
+  <strong>No authentication layer</strong><br/>
+  The API has no auth. Any client can call <code>/ask</code> or <code>/roadmap</code>. Acceptable for local development; not acceptable for public deployment. An API key header or JWT middleware would be added before hosting.
+</div>
+
+
+<!-- SECTION 6 -->
+<h2>6. What I Would Do Differently in Hindsight</h2>
+
+<div class="hindsight">
+  <strong>Initialise the database before running the pipeline</strong><br/>
+  <code>init_db()</code> was wired into the FastAPI startup lifespan, so it only ran when the server started. Running the pipeline first caused "relation does not exist" errors and silent data loss to JSON. The fix was trivial, but the right design is to call <code>init_db()</code> explicitly at the top of <code>pipeline.py</code> — not rely on an implicit ordering dependency with the server.
+</div>
+
+<div class="hindsight">
+  <strong>Pin Python 3.12 as the explicit baseline from day one</strong><br/>
+  The <code>pydantic-core</code> build failure on Python 3.14 was predictable — Rust-compiled packages lag behind new CPython releases by months. Documenting this constraint upfront would have prevented the environment rebuild.
+</div>
+
+<div class="hindsight">
+  <strong>Abstract the LLM call behind an interface from the start</strong><br/>
+  Designing an <code>LLMClient</code> interface with a <code>generate(prompt) -> str</code> method rather than calling Ollama directly in two separate files would have made provider switching a one-line config change instead of a multi-file edit.
+</div>
+
+<div class="hindsight">
+  <strong>Track extraction quality metrics from the first run</strong><br/>
+  I logged extraction progress but not quality — what fraction of records had company filled, how many were recovered by regex fallback, what fraction were filtered as noise. A post-extraction quality report would have surfaced data quality problems immediately rather than when inspecting the frontend.
+</div>
+
+<div class="hindsight">
+  <strong>Start with 200+ extracted records before evaluating search quality</strong><br/>
+  Building the FAISS index with 20 records was fine for pipeline validation but gave an unrealistic picture of semantic search quality. A larger initial extraction would have produced more honest early results and surfaced retrieval quality issues sooner.
+</div>
+
+
+<!-- SUMMARY -->
+<div class="summary-box">
+  <strong>Summary</strong><br/><br/>
+  PrepAIEngine is a full-stack AI system that turns unstructured Reddit interview posts into a searchable, analytically rich, and personally useful interview intelligence platform. The core engineering challenge was the extraction pipeline — getting a local LLM to reliably produce structured output from noisy text, and building the fallback and filtering layers that make the extracted data trustworthy enough to power search, analytics, and recommendations. Every architectural decision — FAISS over a vector database, PostgreSQL with JSONB over a document store, local LLM over an API, hybrid search over pure semantic retrieval — was made with explicit reasoning about current scale, future migration paths, and the specific failure modes of each alternative. The decisions I would revisit are operational rather than architectural, which I take as a reasonable signal that the core design held up under real implementation pressure.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+# Environment — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Data — large files, rebuilt by pipeline
+data/raw/
+data/processed/
+data/faiss_index.bin
+data/faiss_metadata.json
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
