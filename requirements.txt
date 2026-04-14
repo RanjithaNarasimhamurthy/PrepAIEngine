@@ -16,8 +16,8 @@ redis==5.0.3
 # Vector search
 faiss-cpu==1.13.2
 
-# Embeddings
-sentence-transformers==2.6.1
+# Embeddings — fastembed uses ONNX Runtime (no PyTorch) to stay within free-tier RAM
+fastembed==0.2.7
 numpy==1.26.4
 
 # HTTP / LLM

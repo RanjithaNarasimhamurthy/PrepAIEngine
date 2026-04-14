@@ -242,10 +242,9 @@ def get_all_texts_for_embedding() -> List[Dict]:
             COALESCE(company, '') || ' ' ||
             COALESCE(role, '') || ' ' ||
             COALESCE(array_to_string(topics, ' '), '') || ' ' ||
-            COALESCE(array_to_string(questions, ' | '), '') || ' ' ||
-            COALESCE(raw_text, '')  AS combined_text
+            COALESCE(array_to_string(questions, ' | '), '')  AS combined_text
         FROM interviews
-        WHERE raw_text IS NOT NULL AND raw_text <> '';
+        WHERE company <> '' OR topics <> '{}' OR questions <> '{}';
     """
     with get_conn() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:

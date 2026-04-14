@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 FAISS_INDEX_PATH    = os.getenv("FAISS_INDEX_PATH",    "./data/faiss_index.bin")
 FAISS_METADATA_PATH = os.getenv("FAISS_METADATA_PATH", "./data/faiss_metadata.json")
-EMBEDDING_MODEL     = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL     = "BAAI/bge-small-en-v1.5"   # 384-dim, ONNX-based via fastembed
 EMBEDDING_DIM       = 384
 
 # Lazy-loaded singletons
@@ -34,9 +34,9 @@ _id_map: List[int] = []   # FAISS position → PostgreSQL interview id
 def _get_model():
     global _model
     if _model is None:
-        from sentence_transformers import SentenceTransformer
+        from fastembed import TextEmbedding
         logger.info("Loading embedding model: %s", EMBEDDING_MODEL)
-        _model = SentenceTransformer(EMBEDDING_MODEL)
+        _model = TextEmbedding(model_name=EMBEDDING_MODEL)
     return _model
 
 
@@ -80,8 +80,8 @@ def _save_to_disk() -> None:
 def embed_texts(texts: List[str]) -> np.ndarray:
     """Return L2-normalised float32 embeddings, shape (N, EMBEDDING_DIM)."""
     model = _get_model()
-    vecs  = model.encode(texts, batch_size=32, show_progress_bar=False, convert_to_numpy=True)
-    vecs  = vecs.astype(np.float32)
+    # fastembed returns a generator of numpy arrays
+    vecs  = np.array(list(model.embed(texts)), dtype=np.float32)
     # L2-normalise so IndexFlatIP == cosine similarity
     norms = np.linalg.norm(vecs, axis=1, keepdims=True)
     norms = np.where(norms == 0, 1.0, norms)
