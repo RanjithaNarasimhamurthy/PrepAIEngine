@@ -195,7 +195,7 @@ def query_interviews(
     params += [limit, offset]
 
     sql = f"""
-        SELECT id, company, role, offer_status, rounds, oa,
+        SELECT id, reddit_id, company, role, offer_status, rounds, oa,
                topics, questions, prep_insights, score, created_at
         FROM interviews
         {where}
@@ -220,7 +220,7 @@ def get_interviews_by_ids(ids: List[int]) -> List[Dict]:
     if not ids:
         return []
     sql = """
-        SELECT id, company, role, offer_status, rounds, oa,
+        SELECT id, reddit_id, company, role, offer_status, rounds, oa,
                topics, questions, prep_insights, raw_text, score, created_at
         FROM interviews
         WHERE id = ANY(%s);

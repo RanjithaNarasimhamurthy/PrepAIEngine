@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Building2, Briefcase, Star } from "lucide-react";
+import { ChevronDown, ChevronUp, Building2, Briefcase, Star, ExternalLink } from "lucide-react";
 import clsx from "clsx";
 import type { Interview, OfferStatus } from "@/types";
 
@@ -42,7 +42,7 @@ export default function InterviewCard({ interview }: Props) {
 
   const {
     company, role, offer_status, topics, questions,
-    rounds, prep_insights, score, similarity_score,
+    rounds, prep_insights, score, similarity_score, reddit_id,
   } = interview;
 
   return (
@@ -69,6 +69,18 @@ export default function InterviewCard({ interview }: Props) {
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
+          {reddit_id && (
+            <a
+              href={`https://reddit.com/comments/${reddit_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-400 hover:text-orange-600 transition-colors"
+              title="View original Reddit post"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          )}
           {score > 0 && (
             <div className="flex items-center gap-1 text-xs text-amber-600">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />

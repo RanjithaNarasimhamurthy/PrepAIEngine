@@ -20,6 +20,7 @@ export type OfferStatus = "offered" | "rejected" | "no_offer" | "pending" | "unk
 
 export interface Interview {
   id:            number;
+  reddit_id?:    string;
   company:       string;
   role:          string;
   offer_status:  OfferStatus;
